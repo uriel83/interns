@@ -1,0 +1,54 @@
+version: '3.3'
+services:
+  nodejs:
+    container_name: nodejs
+    # image_name :
+    build:
+      context: ./nodejs
+      dockerfile: 'docker/Dockerfile'  
+    volumes:
+      - './nodejs/:/project/'
+      - '/project/node_modules'
+    command: >
+      bash -c "node app.js --host 0.0.0.0 --port 5001"
+    ports:
+      - '5001:5001'
+    depends_on:
+      - mongo
+  angular:
+    container_name: angular
+    build:
+      context: ./angular-intern
+      dockerfile: 'docker/Dockerfile'
+    volumes:
+      - './angular-intern:/project'
+      - '/project/node_modules'
+    command: >
+      bash -c "ng serve --host 0.0.0.0 --port 4300"
+    ports:
+      - '4300:4300'
+    depends_on:
+      - nodejs
+  
+  mongo:
+      container_name: mongo
+      image: mongo
+      restart: always
+      ports:
+        - 27018:27017
+      # volumes:
+      # - data:/data
+    # environment:
+    #   MONGO_INITDB_ROOT_USERNAME: admin
+    #   MONGO_INITDB_ROOT_PASSWORD: password
+  
+  # mongo-express:
+  #     container_name: docker_node_mongo
+  #     image: mongo-express
+  #     restart: always
+  #     ports:
+  #       - 8082:8081
+    # environment:
+    #   ME_CONFIG_MONGODB_ADMINUSERNAME: admin
+    #   ME_CONFIG_MONGODB_ADMINPASSWORD: password
+    #   ME_CONFIG_MONGODB_URL: mongodb:mongodb
